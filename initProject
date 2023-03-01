@@ -1,0 +1,45 @@
+#!/bin/bash
+
+args=$1
+args2=$2
+args3=$3
+
+variable1='react'
+repo1='https://github.com/AGuekdjian/'
+repo2='.git'
+repoDef=$repo1$args3$repo2
+
+cd $args
+echo '--------------------------------'
+echo 'Moviendo al directorio indicado.'
+echo '--------------------------------'
+if [ $args2 == $variable1 ]; then
+	echo '-----------------------------------------'
+	echo 'Inicializando proyecto en React con Vite.'
+	echo '-----------------------------------------'
+	yarn create vite $args3 --template react && cd $args3
+	echo '------------------------------------------------'
+    echo 'Moviendo al proyecto y inicializando git y repo.'
+    echo '------------------------------------------------'
+    yarn && git init && gh repo create $args3 --public
+	echo '-------------------------------------'
+	echo 'Pusheando el proyecto al repositorio.'
+	echo '-------------------------------------'
+	git add . && git commit -m "First commit, add project."
+	echo '-------------------------------------'
+	git branch -M main
+	echo '-------------------------------------'
+	echo 'Rama main establecida'
+	echo '-------------------------------------'
+	echo '-------------------------------------'
+	echo 'Subiendo el repositorio local al remoto'
+	echo '-------------------------------------'
+	git remote add origin $repoDef
+	echo '-------------------------------------'
+	echo 'Pusheando...'
+	echo '------------'
+	git push -u origin main
+	echo '----------'
+	echo 'Terminado.'
+	echo '----------'
+fi
