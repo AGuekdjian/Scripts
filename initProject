@@ -1,45 +1,80 @@
 #!/bin/bash
 
-args=$1
-args2=$2
-args3=$3
+framework='react'
+url='https://github.com/AGuekdjian/'
+ext='.git'
+name=$3
+repoDef=$url$name$ext
 
-variable1='react'
-repo1='https://github.com/AGuekdjian/'
-repo2='.git'
-repoDef=$repo1$args3$repo2
+check_exit_code() {
+    if [ $? -ne 0 ]; then
+    echo "Ah ocurrido un error: $1"
+    exit 1
+    fi
+}
 
-cd $args
+while getopts "r" opt; do
+  case $opt in
+    r)
+      framework="react"
+      ;;
+    \?)
+      echo "Uso: $0 [-r]  [otros argumentos]"
+      exit 1
+      ;;
+  esac
+done
+
 echo '--------------------------------'
 echo 'Moviendo al directorio indicado.'
 echo '--------------------------------'
-if [ $args2 == $variable1 ]; then
+cd $2
+printf "\n"
+
+if [ $framework == "react" ]; then
 	echo '-----------------------------------------'
 	echo 'Inicializando proyecto en React con Vite.'
 	echo '-----------------------------------------'
-	yarn create vite $args3 --template react && cd $args3
+	npm create vite@latest $name -- --template $framework && cd $name
+	check_exit_code "Error al crear el proyecto con vite"
+	printf "\n"
+
 	echo '------------------------------------------------'
     echo 'Moviendo al proyecto y inicializando git y repo.'
     echo '------------------------------------------------'
-    yarn && git init && gh repo create $args3 --public
+    npm i && git init && gh repo create $name --public
+	check_exit_code "Error al crear el repositorio remoto"
+	printf "\n"
+
 	echo '-------------------------------------'
 	echo 'Pusheando el proyecto al repositorio.'
 	echo '-------------------------------------'
 	git add . && git commit -m "First commit, add project."
-	echo '-------------------------------------'
+	check_exit_code "Error al hacer el commit"
+	printf "\n"
+	
+	echo '---------------------------------------'
+	echo 'Estableciendo main como rama principal.'
+	echo '---------------------------------------'
 	git branch -M main
-	echo '-------------------------------------'
-	echo 'Rama main establecida'
-	echo '-------------------------------------'
-	echo '-------------------------------------'
-	echo 'Subiendo el repositorio local al remoto'
-	echo '-------------------------------------'
+	check_exit_code "Error branch"
+	printf "\n"
+
+	echo '----------------------------------------'
+	echo 'Subiendo el repositorio local al remoto.'
+	echo '----------------------------------------'
 	git remote add origin $repoDef
-	echo '-------------------------------------'
+	check_exit_code "Error al subir el repositorio local al remoto"
+	printf "\n"
+
+	echo '------------'
 	echo 'Pusheando...'
 	echo '------------'
 	git push -u origin main
-	echo '----------'
-	echo 'Terminado.'
-	echo '----------'
+	check_exit_code "Error al realizar push"
+	printf "\n"
+
+	echo '--------------------'
+	echo 'Terminado con exito.'
+	echo '--------------------'
 fi
